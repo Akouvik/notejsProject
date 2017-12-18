@@ -1,4 +1,3 @@
-console.log("Starting app.js");
 
 const fs = require('fs');
 const _ = require('lodash');
@@ -7,11 +6,31 @@ const yargs = require('yargs');
 const notes = require('./notes.js');
 
 //where yarg stores its version of the argument that my app rans
-const argv = yargs.argv;
+
+
+const titleOptions = {
+            describe: ' Title of note',
+            demand: true,
+            alias: 't'
+        }
+
+const bodyOptions = {
+    describe: 'Body of note',
+    demand: true,
+    alias: 'b'
+}
+//console.log(bodyOptions());
+
+
+const argv = yargs
+    .command('add', 'add a new note',{title:titleOptions, body:bodyOptions})
+    .command('list', 'list all notes')
+    .command('read', 'read a note', {title:titleOptions})
+    .command('remove', 'remove this note', {
+        title:titleOptions})
+    .help()
+    .argv;
 var command = argv._[0];
-console.log('Command: ', command);
-//arguments that your process ran are stored in argv
-console.log('Yargs', argv);
 
 if(command === 'add'){
    var note = notes.addNote(argv.title, argv.body);
@@ -23,7 +42,10 @@ if(command === 'add'){
         console.log('note not created, title already in use');
     }
 }else if(command === 'list'){
-    notes.getAll();
+    var allNotes = notes.getAll();
+    console.log(`printing ${allNotes.length} note(s)`);
+    allNotes.forEach((note) => 
+        notes.logNote(note));
 }else if(command === 'read'){
     var note = notes.getNote(argv.title);
     if(note){
